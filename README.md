@@ -1,6 +1,6 @@
-# Goodkind — storefront and shop admin
+# Aeiou — storefront and shop admin
 
-A mobile-first storefront with editable products and homepage banners, WhatsApp checkout, an admin sales dashboard, and a FastAPI backend. Supabase stores the catalogue, image uploads, order records, and sales status. Vercel can host the FastAPI application and the storefront from this folder.
+A mobile-first Aeiou storefront with the supplied gold logo, editable products and homepage banners, WhatsApp checkout, an admin sales dashboard, and a FastAPI backend. Product cards and page sections use lightweight motion effects, with reduced-motion preferences respected. Supabase stores the catalogue, image uploads, order records, and sales status. Vercel can host the FastAPI application and the storefront from this folder.
 
 ## What the admin can do
 
@@ -16,8 +16,12 @@ Only orders marked **confirmed** or **completed** count as sales. WhatsApp order
 
 1. Create a Supabase project and open **SQL Editor**.
 2. Run [`supabase/schema.sql`](supabase/schema.sql). It creates the tables and guarded order/dashboard functions, sets row-level security, creates the public image bucket, and adds the eight example products and three example banners. Existing product edits are preserved when you run the seed section again.
-3. In **Authentication → Users**, invite/create an administrator account. Add its email to `ADMIN_EMAILS`.
+3. In **Authentication → Users**, invite/create an administrator account and set its password. Add its email to `ADMIN_EMAILS`.
 4. Copy the project URL, anon key, and service-role key from **Project Settings → API**. Keep the service-role key private; add it only as a server environment variable in local `.env` and Vercel. Never put it in browser JavaScript or commit it.
+
+### Admin sign-in
+
+Open `/admin` and sign in with the email and password of the Supabase Auth user whose email is included in `ADMIN_EMAILS`. There are no built-in/default admin credentials. The example `.env.example` value `you@example.com` is a placeholder, not a real account.
 
 ## 2. Run locally
 
@@ -30,7 +34,7 @@ python -m pip install -r requirements-dev.txt
 Copy-Item .env.example .env
 ```
 
-Fill in the Supabase values and admin email in `.env`, then start the app:
+Fill in the Supabase values, your admin email, and `STORE_NAME=Aeiou` in `.env`, then start the app:
 
 ```powershell
 python -m uvicorn main:app --reload
@@ -54,6 +58,7 @@ Set `WHATSAPP_NUMBER` to the shop number including country code, digits only (fo
 - Storefront visitors can read active products and banners and place an order. They cannot directly write products, banner settings, or order status.
 - Product and banner removals are soft deletes so past order items remain readable.
 - Checkout recalculates prices and stock in a database function, saves a pending order, then opens a WhatsApp message with the saved order summary. Customer/payment confirmation still happens outside the site.
+- Cancelling an order restores reserved stock; reopening a cancelled order reserves it again only when stock is available. Completed orders cannot be reopened or cancelled.
 - Orders are not associated with customer accounts in this starter version; the admin manages the store-wide order list.
 
 The shop name, currency, shipping policy, and wording are illustrative defaults. Adjust the product/banner seed rows and the order policy in `supabase/schema.sql` before launch if they do not match the business.
