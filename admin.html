@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f8f5ed" />
+    <title>Store administration — Goodkind</title>
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="stylesheet" href="admin.css" />
+    <script src="admin.js" defer></script>
+  </head>
+  <body>
+    <main class="login-shell" id="login-screen">
+      <a class="admin-brand" href="/" aria-label="Goodkind storefront">
+        <span class="brand-seal">g</span>
+        <span>goodkind<span>.</span></span>
+      </a>
+      <section class="login-card">
+        <span class="eyebrow">Store management</span>
+        <h1>Welcome back.</h1>
+        <p>Sign in with your authorized shop administrator account.</p>
+        <form id="login-form">
+          <label>Email address<input name="email" type="email" autocomplete="username" required /></label>
+          <label>Password<input name="password" type="password" autocomplete="current-password" required /></label>
+          <p class="form-error" id="login-error" role="alert" hidden></p>
+          <button class="button button-primary" type="submit">Sign in <span aria-hidden="true">→</span></button>
+        </form>
+        <a class="return-link" href="/">← Return to the storefront</a>
+      </section>
+      <p class="login-footnote">Private access for the Goodkind team</p>
+    </main>
+
+    <div class="admin-layout" id="admin-app" hidden>
+      <aside class="sidebar">
+        <a class="admin-brand" href="/" aria-label="Goodkind storefront">
+          <span class="brand-seal">g</span>
+          <span>goodkind<span>.</span></span>
+        </a>
+        <span class="sidebar-label">YOUR BOUTIQUE</span>
+        <nav class="admin-nav" aria-label="Admin navigation">
+          <button class="admin-nav-link is-active" type="button" data-panel="overview"><span>◷</span> Overview</button>
+          <button class="admin-nav-link" type="button" data-panel="orders"><span>▤</span> Orders <span class="nav-count" id="pending-count">0</span></button>
+          <button class="admin-nav-link" type="button" data-panel="products"><span>◇</span> Products</button>
+          <button class="admin-nav-link" type="button" data-panel="banners"><span>▧</span> Banners</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="view-store" href="/">↗ <span>View storefront</span></a>
+          <div class="admin-identity"><span class="identity-seal">G</span><span class="identity-email" id="admin-email">Store administrator</span></div>
+          <button class="sign-out-button" type="button" data-action="logout">Sign out</button>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div>
+            <span class="eyebrow">GOODKIND · ADMIN</span>
+            <h1 id="page-title">A lovely overview</h1>
+          </div>
+          <a class="store-shortcut" href="/">View store <span aria-hidden="true">↗</span></a>
+        </header>
+
+        <section class="admin-panel is-current" data-section="overview">
+          <div class="welcome-row">
+            <div><h2>Your shop, at a glance.</h2><p>A calm moment to see how things are going.</p></div>
+            <span class="date-pill" id="today-label"></span>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card metric-featured"><span>Confirmed revenue</span><strong id="metric-revenue">$0.00</strong><small>From confirmed and completed orders</small></article>
+            <article class="metric-card"><span>Confirmed orders</span><strong id="metric-confirmed">0</strong><small>Orders marked confirmed or complete</small></article>
+            <article class="metric-card"><span>Waiting for you</span><strong id="metric-pending">0</strong><small>New orders to follow up</small></article>
+            <article class="metric-card"><span>Active products</span><strong id="metric-products">0</strong><small>Lovely finds available to shop</small></article>
+          </div>
+          <div class="dashboard-grid">
+            <section class="admin-card sales-card">
+              <div class="card-heading"><div><span class="eyebrow">THE LAST SEVEN DAYS</span><h2>Confirmed sales</h2></div><span class="chart-caption">USD</span></div>
+              <div class="sales-chart" id="sales-chart" aria-label="Confirmed sales for the last seven days"></div>
+            </section>
+            <section class="admin-card quick-card">
+              <span class="eyebrow">A QUICK LITTLE SHORTCUT</span><h2>What would you like to do?</h2>
+              <button type="button" class="quick-link" data-action="quick-add-product"><span class="quick-icon">＋</span><span><strong>Add a product</strong><small>Introduce something new</small></span><span>→</span></button>
+              <button type="button" class="quick-link" data-action="navigate" data-panel="banners"><span class="quick-icon">▧</span><span><strong>Refresh a banner</strong><small>Give the home page a new look</small></span><span>→</span></button>
+              <button type="button" class="quick-link" data-action="navigate" data-panel="orders"><span class="quick-icon">▤</span><span><strong>See new orders</strong><small>Follow up with a customer</small></span><span>→</span></button>
+            </section>
+          </div>
+          <section class="admin-card recent-card">
+            <div class="card-heading"><div><span class="eyebrow">FRESH FROM THE SHOP</span><h2>Recent orders</h2></div><button class="subtle-link" type="button" data-action="navigate" data-panel="orders">All orders →</button></div>
+            <div id="recent-orders"></div>
+          </section>
+        </section>
+
+        <section class="admin-panel" data-section="orders" hidden>
+          <div class="section-intro"><div><span class="eyebrow">CUSTOMER ORDERS</span><h2>Every order, cared for.</h2><p>Update an order as you confirm it with your customer.</p></div></div>
+          <div class="table-card"><div class="admin-order-list" id="orders-list"></div></div>
+        </section>
+
+        <section class="admin-panel" data-section="products" hidden>
+          <div class="section-intro section-intro-row"><div><span class="eyebrow">YOUR COLLECTION</span><h2>Lovely things, listed.</h2><p>Add, update, or quietly retire a product.</p></div><button class="button button-primary" type="button" data-action="add-product">＋ Add product</button></div>
+          <div class="collection-tools"><label class="admin-search">⌕ <input id="product-search" type="search" placeholder="Find a product" aria-label="Find a product" /></label><span id="product-count"></span></div>
+          <div class="product-admin-grid" id="products-grid"></div>
+        </section>
+
+        <section class="admin-panel" data-section="banners" hidden>
+          <div class="section-intro section-intro-row"><div><span class="eyebrow">FIRST IMPRESSIONS</span><h2>Your home page, your way.</h2><p>Refresh a banner image or edit its words and collection.</p></div><button class="button button-primary" type="button" data-action="add-banner">＋ Add banner</button></div>
+          <div class="banner-admin-list" id="banners-list"></div>
+        </section>
+      </main>
+
+      <nav class="mobile-admin-nav" aria-label="Mobile admin navigation">
+        <button class="is-active" type="button" data-panel="overview"><span>◷</span>Overview</button>
+        <button type="button" data-panel="orders"><span>▤</span>Orders</button>
+        <button type="button" data-panel="products"><span>◇</span>Products</button>
+        <button type="button" data-panel="banners"><span>▧</span>Banners</button>
+      </nav>
+    </main>
+
+    <dialog class="editor-dialog" id="product-dialog">
+      <form class="editor-form" id="product-form">
+        <div class="dialog-heading"><div><span class="eyebrow">YOUR COLLECTION</span><h2 id="product-dialog-title">Add a product</h2></div><button type="button" class="dialog-close" data-action="close-dialog" aria-label="Close">×</button></div>
+        <input type="hidden" name="id" />
+        <div class="form-grid">
+          <label class="field-wide">Product name<input name="name" maxlength="120" required /></label>
+          <label>Category<select name="category" required><option value="wear">Wear</option><option value="home">Home</option><option value="accessories">Accessories</option><option value="wellness">Wellness</option></select></label>
+          <label>Price (USD)<input name="price" type="number" min="0.01" step="0.01" required /></label>
+          <label>Product label<input name="label" maxlength="40" placeholder="Bestseller, New..." /></label>
+          <label>Stock quantity <span class="field-hint">(leave empty for unlimited)</span><input name="stock_quantity" type="number" min="0" step="1" /></label>
+          <label>Image<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" /><span class="field-hint">JPEG, PNG, WebP or GIF · up to 5 MB</span></label>
+          <label class="field-wide">Image description<input name="image_alt" maxlength="240" required /></label>
+          <label class="field-wide">Description<textarea name="description" rows="3" maxlength="2000"></textarea></label>
+          <label>Display order<input name="sort_order" type="number" min="0" step="1" value="100" /></label>
+          <label class="check-field"><input name="trending" type="checkbox" /> Show in trending</label>
+          <label class="check-field"><input name="is_active" type="checkbox" checked /> Available in shop</label>
+          <input type="hidden" name="image_url" />
+          <img class="form-image-preview" id="product-image-preview" alt="" hidden />
+        </div>
+        <p class="form-error" id="product-form-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button type="button" class="button button-quiet" data-action="close-dialog">Cancel</button><button type="submit" class="button button-primary">Save product</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="editor-dialog" id="banner-dialog">
+      <form class="editor-form" id="banner-form">
+        <div class="dialog-heading"><div><span class="eyebrow">FIRST IMPRESSIONS</span><h2 id="banner-dialog-title">Add a banner</h2></div><button type="button" class="dialog-close" data-action="close-dialog" aria-label="Close">×</button></div>
+        <input type="hidden" name="id" />
+        <div class="form-grid">
+          <label>Small heading<input name="eyebrow" maxlength="80" required /></label>
+          <label>Button label<input name="button_label" maxlength="60" required /></label>
+          <label class="field-wide">Headline<input name="headline" maxlength="160" required /></label>
+          <label class="field-wide">Description<textarea name="description" rows="2" maxlength="400"></textarea></label>
+          <label>Button collection<select name="category"><option value="all">Everything</option><option value="wear">Wear</option><option value="home">Home</option><option value="accessories">Accessories</option><option value="wellness">Wellness</option></select></label>
+          <label>Display order<input name="sort_order" type="number" min="0" step="1" value="100" /></label>
+          <label class="field-wide">Banner image<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" /><span class="field-hint">JPEG, PNG, WebP or GIF · up to 5 MB</span></label>
+          <label class="field-wide">Image description<input name="image_alt" maxlength="240" required /></label>
+          <label class="check-field"><input name="is_active" type="checkbox" checked /> Show this banner</label>
+          <input type="hidden" name="image_url" />
+          <img class="form-image-preview" id="banner-image-preview" alt="" hidden />
+        </div>
+        <p class="form-error" id="banner-form-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button type="button" class="button button-quiet" data-action="close-dialog">Cancel</button><button type="submit" class="button button-primary">Save banner</button></div>
+      </form>
+    </dialog>
+    <div class="toast" id="admin-toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
