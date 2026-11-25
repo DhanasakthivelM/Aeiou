@@ -192,6 +192,87 @@ $$;
 revoke all on function public.create_store_order(jsonb) from public;
 grant execute on function public.create_store_order(jsonb) to anon, authenticated, service_role;
 
+create or replace function public.admin_update_order_status(p_order_id uuid, p_status text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  order_row public.orders%rowtype;
+  stock_row record;
+  available_stock integer;
+begin
+  if p_status is null or p_status not in ('pending', 'confirmed', 'completed', 'cancelled') then
+    raise exception 'Choose a valid order status.';
+  end if;
+
+  select * into order_row
+  from public.orders
+  where id = p_order_id
+  for update;
+  if not found then
+    return null;
+  end if;
+
+  if order_row.status = 'completed' and p_status <> 'completed' then
+    raise exception 'Completed orders cannot be reopened or cancelled.';
+  end if;
+
+  if order_row.status <> 'cancelled' and p_status = 'cancelled' then
+    for stock_row in
+      select product_id, sum(quantity)::integer as quantity
+      from public.order_items
+      where order_id = p_order_id and product_id is not null
+      group by product_id
+    loop
+      update public.products
+      set stock_quantity = stock_quantity + stock_row.quantity, updated_at = now()
+      where id = stock_row.product_id and stock_quantity is not null;
+    end loop;
+  elsif order_row.status = 'cancelled' and p_status <> 'cancelled' then
+    for stock_row in
+      select product_id, sum(quantity)::integer as quantity
+      from public.order_items
+      where order_id = p_order_id and product_id is not null
+      group by product_id
+    loop
+      select stock_quantity into available_stock
+      from public.products
+      where id = stock_row.product_id
+      for update;
+      if found and available_stock is not null then
+        if available_stock < stock_row.quantity then
+          raise exception 'There is not enough stock to reopen this order.';
+        end if;
+        update public.products
+        set stock_quantity = stock_quantity - stock_row.quantity, updated_at = now()
+        where id = stock_row.product_id;
+      end if;
+    end loop;
+  end if;
+
+  update public.orders
+  set status = p_status, updated_at = now()
+  where id = p_order_id
+  returning * into order_row;
+
+  return jsonb_build_object(
+    'id', order_row.id,
+    'order_number', order_row.order_number,
+    'status', order_row.status,
+    'subtotal', order_row.subtotal,
+    'shipping', order_row.shipping,
+    'total', order_row.total,
+    'created_at', order_row.created_at,
+    'updated_at', order_row.updated_at
+  );
+end;
+$$;
+
+revoke all on function public.admin_update_order_status(uuid, text) from public, anon, authenticated;
+grant execute on function public.admin_update_order_status(uuid, text) to service_role;
+
 create or replace function public.admin_dashboard_summary()
 returns jsonb
 language sql

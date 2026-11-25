@@ -8,7 +8,6 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
-from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import Annotated, Literal
@@ -22,7 +21,7 @@ ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
 app = FastAPI(
-    title="Goodkind Store API",
+    title="Aeiou Store API",
     docs_url=None,
     redoc_url=None,
     openapi_url=None,
@@ -288,7 +287,7 @@ def health():
 def public_config():
     whatsapp_number = re.sub(r"\D", "", os.getenv("WHATSAPP_NUMBER", ""))
     return {
-        "store_name": os.getenv("STORE_NAME", "Goodkind").strip() or "Goodkind",
+        "store_name": os.getenv("STORE_NAME", "Aeiou").strip() or "Aeiou",
         "whatsapp_number": whatsapp_number,
         "currency": "USD",
     }
@@ -535,17 +534,16 @@ def admin_orders(_admin: Admin):
 
 
 @app.patch("/api/admin/orders/{order_id}")
-def update_order_status(order_id: str, patch: OrderStatusPatch, _admin: Admin):
+def update_order_status(order_id: uuid.UUID, patch: OrderStatusPatch, _admin: Admin):
     try:
-        result = _table_request(
-            "PATCH",
-            "orders",
-            {"id": f"eq.{order_id}", "select": "*"},
-            {"status": patch.status, "updated_at": datetime.now(timezone.utc).isoformat()},
+        result = _supabase_request(
+            "POST",
+            "/rest/v1/rpc/admin_update_order_status",
+            payload={"p_order_id": str(order_id), "p_status": patch.status},
         )
-        if not result:
+        if result is None:
             raise HTTPException(status_code=404, detail="Order not found.")
-        return result[0]
+        return result
     except SupabaseError as error:
         _raise_supabase_error(error)
 
@@ -609,6 +607,11 @@ async def upload_media(request: Request, _admin: Admin):
 @app.get("/admin/", include_in_schema=False)
 def admin_page():
     return FileResponse(ROOT / "admin.html")
+
+
+@app.get("/assets/{asset_name}", include_in_schema=False)
+def brand_asset(asset_name: Literal["aeiou-mark.png", "aeiou-logo.png", "aeiou-logo-light.png"]):
+    return FileResponse(ROOT / "assets" / asset_name, media_type="image/png")
 
 
 @app.get("/", include_in_schema=False)

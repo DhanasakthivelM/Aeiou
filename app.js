@@ -9,6 +9,7 @@ const storageKeys = {
   orders: "goodkind-orders",
 };
 
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const state = {
   cart: readStorage(storageKeys.cart, []),
   favorites: readStorage(storageKeys.favorites, []),
@@ -25,6 +26,25 @@ const pageSections = [...document.querySelectorAll("[data-page]")];
 const navLinks = [...document.querySelectorAll(".nav-link")];
 const drawer = document.querySelector("#cart-drawer");
 const backdrop = document.querySelector(".drawer-backdrop");
+let carouselTimer = null;
+const motionObserver = !prefersReducedMotion && "IntersectionObserver" in window
+  ? new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-revealed");
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -28px 0px" })
+  : null;
+
+if (motionObserver) document.documentElement.classList.add("motion-ready");
+
+function watchMotionTargets(root = document) {
+  if (!motionObserver) return;
+  root.querySelectorAll('[data-motion-reveal]:not(.is-revealed)').forEach((element) => {
+    motionObserver.observe(element);
+  });
+}
 
 function readStorage(key, fallback) {
   const saved = localStorage.getItem(key);
@@ -109,11 +129,11 @@ function renderBanners() {
   state.slide = 0;
 }
 
-function productCard(product) {
+function productCard(product, index) {
   const favorite = state.favorites.includes(product.id);
   const badge = product.label ? `<span class="product-badge">${escapeHtml(product.label)}</span>` : "";
   return `
-    <article class="product-card">
+    <article class="product-card" data-motion-reveal style="--motion-delay:${Math.min(index, 6) * 65}ms">
       <div class="product-image-wrap">
         <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.image_alt)}" loading="lazy" />
         ${badge}
@@ -157,6 +177,7 @@ function renderProducts() {
     : '<p class="empty-products">No finds match that search. Try another word or category.</p>';
   document.querySelector("#results-count").textContent = `${sorted.length} ${sorted.length === 1 ? "find" : "finds"} to love`;
   updateFilterButtons();
+  watchMotionTargets();
 }
 
 function updateFilterButtons() {
@@ -276,10 +297,12 @@ function setPage(pageName, updateUrl = true) {
   if (pageName === "orders") renderOrders();
   if (pageName === "shop") renderProducts();
   if (pageName === "trending") {
-    window.setTimeout(() => document.querySelector("#trending-section").scrollIntoView({ behavior: "smooth" }), 0);
+    const behavior = prefersReducedMotion ? "auto" : "smooth";
+    window.setTimeout(() => document.querySelector("#trending-section").scrollIntoView({ behavior }), 0);
   } else {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
   }
+  watchMotionTargets();
 }
 
 function setCategory(category, page = "shop") {
@@ -358,7 +381,7 @@ async function checkout() {
     const orderNumber = savedOrder.order_number;
     const orderItems = savedOrder.items || [];
     const message = [
-      "Hello! I'd like to place an order with Goodkind.",
+      "Hello! I'd like to place an order with Aeiou.",
       `Order: ${orderNumber}`,
       "",
       ...orderItems.map((item) => `${item.quantity} x ${item.product_name} - ${formatPrice(Number(item.line_total))}`),
@@ -442,6 +465,7 @@ async function loadStore() {
     state.whatsappNumber = config.whatsapp_number || "";
     renderBanners();
     renderProducts();
+    startCarousel();
     if (!products.length) {
       notice.textContent = "Your product catalogue is empty. Add your first product in the store admin.";
       notice.hidden = false;
@@ -507,7 +531,7 @@ document.addEventListener("click", (event) => {
   if (action === "go-slide") showSlide(Number(trigger.dataset.slide));
   if (action === "open-whatsapp") {
     const recipient = state.whatsappNumber;
-    const message = encodeURIComponent("Hello Goodkind! I'd love a little help finding something lovely.");
+    const message = encodeURIComponent("Hello Aeiou! I'd love a little help finding something lovely.");
     window.open(recipient ? `https://wa.me/${recipient}?text=${message}` : `https://wa.me/?text=${message}`, "_blank", "noopener,noreferrer");
   }
 });
@@ -541,19 +565,30 @@ window.addEventListener("popstate", () => {
   setPage(["home", "shop", "trending", "orders"].includes(requestedPage) ? requestedPage : "home", false);
 });
 
-let carouselTimer = window.setInterval(() => {
-  if (!document.hidden) showSlide(state.slide + 1);
-}, 6000);
+function startCarousel() {
+  if (prefersReducedMotion || document.hidden || banners.length < 2 || carouselTimer) return;
+  carouselTimer = window.setInterval(() => showSlide(state.slide + 1), 6000);
+}
 
-document.querySelector(".hero-carousel").addEventListener("mouseenter", () => window.clearInterval(carouselTimer));
-document.querySelector(".hero-carousel").addEventListener("mouseleave", () => {
+function stopCarousel() {
   window.clearInterval(carouselTimer);
-  carouselTimer = window.setInterval(() => {
-    if (!document.hidden) showSlide(state.slide + 1);
-  }, 6000);
+  carouselTimer = null;
+}
+
+const heroCarousel = document.querySelector(".hero-carousel");
+heroCarousel.addEventListener("mouseenter", stopCarousel);
+heroCarousel.addEventListener("mouseleave", startCarousel);
+heroCarousel.addEventListener("focusin", stopCarousel);
+heroCarousel.addEventListener("focusout", (event) => {
+  if (!heroCarousel.contains(event.relatedTarget)) startCarousel();
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stopCarousel();
+  else startCarousel();
 });
 
 document.querySelector("#current-year").textContent = String(new Date().getFullYear());
+watchMotionTargets();
 loadStore();
 const initialPage = window.location.hash.slice(1);
 if (["home", "shop", "trending", "orders"].includes(initialPage)) setPage(initialPage, false);

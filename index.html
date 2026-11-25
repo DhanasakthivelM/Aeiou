@@ -8,7 +8,8 @@
       content="Shop thoughtfully chosen everyday favorites, and order directly through WhatsApp."
     />
     <meta name="theme-color" content="#f8f5ed" />
-    <title>Goodkind — little things, lovely living</title>
+    <title>Aeiou — explore, pick, anytime</title>
+    <link rel="icon" type="image/png" href="/assets/aeiou-mark.png" />
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="stylesheet" href="styles.css" />
     <script src="app.js" defer></script>
@@ -16,9 +17,8 @@
   <body>
     <header class="site-header">
       <div class="header-inner">
-        <a class="brand" href="#home" data-view="home" aria-label="Goodkind home">
-          <span class="brand-mark" aria-hidden="true">g</span>
-          <span>goodkind<span class="brand-period">.</span></span>
+        <a class="brand" href="#home" data-view="home" aria-label="Aeiou home">
+          <img class="brand-mark" src="/assets/aeiou-logo.png" alt="Aeiou" />
         </a>
 
         <button class="menu-toggle icon-button" type="button" aria-label="Open menu" aria-expanded="false">
@@ -61,7 +61,7 @@
 
         <p class="store-status" id="store-status" role="status" hidden></p>
 
-        <section class="section-shell category-section" aria-labelledby="category-title">
+        <section class="section-shell category-section" data-motion-reveal aria-labelledby="category-title">
           <div class="section-heading centered-heading">
             <span class="eyebrow">A little something for everyone</span>
             <h2 id="category-title">Find your kind of lovely</h2>
@@ -79,7 +79,7 @@
           </div>
         </section>
 
-        <section class="section-shell products-section" id="trending-section" aria-labelledby="trending-title">
+        <section class="section-shell products-section" id="trending-section" data-motion-reveal aria-labelledby="trending-title">
           <div class="section-heading section-heading-row">
             <div>
               <span class="eyebrow">Good things going around</span>
@@ -90,17 +90,17 @@
           <div class="product-grid" id="trending-products"></div>
         </section>
 
-        <section class="story-banner">
+        <section class="story-banner" data-motion-reveal>
           <div class="story-image" role="img" aria-label="Handmade ceramic pieces and natural home details"></div>
           <div class="story-copy">
             <span class="eyebrow">A little good goes a long way</span>
             <h2>Thoughtful things.<br />Feel-good living.</h2>
-            <p>We believe the things you use every day should make you smile. That's why every Goodkind find is chosen with care.</p>
+            <p>We believe the things you use every day should make you smile. That's why every Aeiou find is chosen with care.</p>
             <button class="button button-outline" type="button" data-action="go-shop">Find your favorite <span aria-hidden="true">→</span></button>
           </div>
         </section>
 
-        <section class="section-shell reassurance-strip" aria-label="Shopping benefits">
+        <section class="section-shell reassurance-strip" data-motion-reveal aria-label="Shopping benefits">
           <div><span class="benefit-icon" aria-hidden="true">✳</span><strong>Picked with care</strong><span>Thoughtful everyday favorites</span></div>
           <div><span class="benefit-icon" aria-hidden="true">♡</span><strong>Easy WhatsApp orders</strong><span>A real person, just a message away</span></div>
           <div><span class="benefit-icon" aria-hidden="true">↗</span><strong>Free shipping over $75</strong><span>A little extra goodness on us</span></div>
@@ -108,12 +108,12 @@
       </section>
 
       <section class="page-section section-shell shop-page" id="shop-page" data-page="shop" hidden>
-        <div class="page-title">
-          <span class="eyebrow">The goodkind collection</span>
+        <div class="page-title" data-motion-reveal>
+          <span class="eyebrow">The Aeiou collection</span>
           <h1>Shop all the lovely</h1>
           <p>Thoughtfully picked pieces for your everyday.</p>
         </div>
-        <div class="shop-toolbar">
+        <div class="shop-toolbar" data-motion-reveal>
           <div class="filter-list" role="group" aria-label="Filter products by category">
             <button class="filter-chip is-selected" type="button" data-action="filter" data-category="all" aria-pressed="true">Everything</button>
             <button class="filter-chip" type="button" data-action="filter" data-category="wear" aria-pressed="false">Wear</button>
@@ -135,20 +135,20 @@
       </section>
 
       <section class="page-section section-shell orders-page" id="orders-page" data-page="orders" hidden>
-        <div class="page-title">
-          <span class="eyebrow">Your goodkind moments</span>
+        <div class="page-title" data-motion-reveal>
+          <span class="eyebrow">Your Aeiou moments</span>
           <h1>My orders</h1>
           <p>Keep track of WhatsApp checkouts started from this device.</p>
         </div>
-        <div class="orders-list" id="orders-list"></div>
+        <div class="orders-list" id="orders-list" data-motion-reveal></div>
       </section>
     </main>
 
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-brand">
-          <a class="brand brand-light" href="#home" data-view="home"><span class="brand-mark" aria-hidden="true">g</span><span>goodkind<span class="brand-period">.</span></span></a>
-          <p>Little things, lovely living.<br />Thoughtful finds for everyday.</p>
+          <a class="brand brand-light" href="#home" data-view="home" aria-label="Aeiou home"><img class="brand-mark" src="/assets/aeiou-logo-light.png" alt="Aeiou" /></a>
+          <p>Explore. Pick. Anytime.<br />Thoughtful finds for everyday.</p>
         </div>
         <div class="footer-links">
           <div><strong>Explore</strong><a href="#shop" data-view="shop">Shop all</a><a href="#trending" data-view="trending">Trending</a></div>
@@ -156,7 +156,7 @@
         </div>
         <p class="footer-note">Made for the little moments that make a day.</p>
       </div>
-      <div class="footer-bottom"><span>© <span id="current-year"></span> Goodkind</span><span>Thoughtful finds, always.</span></div>
+      <div class="footer-bottom"><span>© <span id="current-year"></span> Aeiou</span><span>Thoughtful finds, always.</span></div>
     </footer>
 
     <div class="drawer-backdrop" data-action="close-cart" hidden></div>

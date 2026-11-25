@@ -168,8 +168,8 @@ function renderProducts() {
     container.innerHTML = '<p class="empty-collection">No products match that search.</p>';
     return;
   }
-  container.innerHTML = products.map((product) => `
-    <article class="product-admin-card">
+  container.innerHTML = products.map((product, index) => `
+    <article class="product-admin-card" style="--card-index:${Math.min(index, 8)}">
       <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.image_alt)}" loading="lazy" />
       <div class="product-admin-info">
         <div class="product-admin-title"><h3>${escapeHtml(product.name)}</h3><strong>${escapeHtml(money(product.price))}</strong></div>
@@ -189,8 +189,8 @@ function renderBanners() {
     container.innerHTML = '<p class="empty-collection">No banners yet. Add one to welcome customers to your shop.</p>';
     return;
   }
-  container.innerHTML = state.banners.map((banner) => `
-    <article class="banner-admin-card">
+  container.innerHTML = state.banners.map((banner, index) => `
+    <article class="banner-admin-card" style="--card-index:${Math.min(index, 6)}">
       <img src="${escapeHtml(banner.image_url)}" alt="${escapeHtml(banner.image_alt)}" loading="lazy" />
       <div class="banner-copy">
         <span class="eyebrow">${escapeHtml(banner.eyebrow)}</span>

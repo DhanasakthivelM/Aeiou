@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#f8f5ed" />
-    <title>Store administration — Goodkind</title>
+    <title>Aeiou store administration</title>
+    <link rel="icon" type="image/png" href="/assets/aeiou-mark.png" />
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="stylesheet" href="admin.css" />
     <script src="admin.js" defer></script>
   </head>
   <body>
     <main class="login-shell" id="login-screen">
-      <a class="admin-brand" href="/" aria-label="Goodkind storefront">
-        <span class="brand-seal">g</span>
-        <span>goodkind<span>.</span></span>
+      <a class="admin-brand" href="/" aria-label="Aeiou storefront">
+        <img class="admin-brand-logo" src="/assets/aeiou-logo.png" alt="Aeiou" />
       </a>
       <section class="login-card">
         <span class="eyebrow">Store management</span>
         <h1>Welcome back.</h1>
-        <p>Sign in with your authorized shop administrator account.</p>
+        <p>Use the email and password for an administrator account created in Supabase Auth and listed in the server's <code>ADMIN_EMAILS</code> setting. There are no default credentials.</p>
         <form id="login-form">
           <label>Email address<input name="email" type="email" autocomplete="username" required /></label>
           <label>Password<input name="password" type="password" autocomplete="current-password" required /></label>
@@ -27,14 +27,13 @@
         </form>
         <a class="return-link" href="/">← Return to the storefront</a>
       </section>
-      <p class="login-footnote">Private access for the Goodkind team</p>
+      <p class="login-footnote">Private access for the Aeiou team</p>
     </main>
 
     <div class="admin-layout" id="admin-app" hidden>
       <aside class="sidebar">
-        <a class="admin-brand" href="/" aria-label="Goodkind storefront">
-          <span class="brand-seal">g</span>
-          <span>goodkind<span>.</span></span>
+        <a class="admin-brand" href="/" aria-label="Aeiou storefront">
+          <img class="admin-brand-logo" src="/assets/aeiou-logo.png" alt="Aeiou" />
         </a>
         <span class="sidebar-label">YOUR BOUTIQUE</span>
         <nav class="admin-nav" aria-label="Admin navigation">
@@ -45,7 +44,7 @@
         </nav>
         <div class="sidebar-bottom">
           <a class="view-store" href="/">↗ <span>View storefront</span></a>
-          <div class="admin-identity"><span class="identity-seal">G</span><span class="identity-email" id="admin-email">Store administrator</span></div>
+          <div class="admin-identity"><img class="identity-seal" src="/assets/aeiou-mark.png" alt="" /><span class="identity-email" id="admin-email">Store administrator</span></div>
           <button class="sign-out-button" type="button" data-action="logout">Sign out</button>
         </div>
       </aside>
@@ -53,7 +52,7 @@
       <main class="admin-main">
         <header class="admin-topbar">
           <div>
-            <span class="eyebrow">GOODKIND · ADMIN</span>
+            <span class="eyebrow">AEIOU · ADMIN</span>
             <h1 id="page-title">A lovely overview</h1>
           </div>
           <a class="store-shortcut" href="/">View store <span aria-hidden="true">↗</span></a>
